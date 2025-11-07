@@ -1,0 +1,23 @@
+WAIT '“– - –¿—◊®“  ŒÃœÀ≈ “”ﬁŸ»’' WINDOW NOWAIT
+*
+SET DECIMAL TO 2
+*
+SELECT trMy103q.tr, trMy103q.i, ich AS kod_det, kompl, cex, kod_ved, trTable10869.q AS norma_na_k,;
+VAL(ALLTRIM(STR(trMy103q.q, 8,2))) AS q, VAL(ALLTRIM(STR(trMy103q.q * trTable10869.q, 8,2))) AS norma_na_i;
+FROM trMy103q, trTable10869 WHERE trMy103q.tr = trTable10869.tr AND trMy103q.i = trTable10869.izd AND;
+trMy103q.ich = trTable10869.kod_izd AND LEFT(trMy103q.ich,1) BETWEEN '0' AND '6';
+ORDER BY ich, kompl, cex INTO CURSOR Cur01
+*
+SELECT tr, i, kod_det, kompl, cex, kod_ved, SUM(norma_na_i) AS norma_na_i;
+FROM Cur01 GROUP BY tr, i, kod_det, kompl, cex ORDER BY tr, i, kod_det, kompl, cex INTO CURSOR Cur02
+*
+SELECT Cur02.tr, Cur02.i, Cur02.kod_det, Cur02.kod_ved, Cur02.kompl, trTable10856.naim_kompl, Cur02.cex,;
+trTable10856.tip, trTable10856.tex_xar, trTable10856.gost, trTable10856.naim_ei, norma_na_i;
+FROM Cur02 LEFT JOIN trTable10856 ON Cur02.tr = trTable10856.tr AND Cur02.i = trTable10856.izd AND Cur02.kompl = trTable10856.kod_kompl;
+ORDER BY Cur02.tr, Cur02.i, Cur02.kod_det, Cur02.kod_ved, Cur02.kompl INTO CURSOR Cur03
+*
+SELECT Cur03.tr, Cur03.i, kod_det, inn, kod_ved, kompl, naim_kompl, cex, tip, tex_xar, gost, naim_ei, norma_na_i;
+FROM Cur03 LEFT JOIN trTable10857 ON Cur03.tr = trTable10857.tr AND Cur03.i = trTable10857.izd AND Cur03.kod_det = trTable10857.i;
+ORDER BY Cur03.tr, Cur03.i, kod_det, kod_ved, kompl INTO TABLE trTable_kpl
+*
+WAIT CLEAR

@@ -1,0 +1,20 @@
+SET SYSMENU OFF
+SET SAFETY OFF
+SET DATE TO BRITISH
+SET CENTURY ON
+SET CENTURY TO 20
+SET HOURS TO 24
+SET ANSI ON
+SET ENGINEBEHAVIOR 70
+SET PROCEDURE TO utils
+* Глобальний модуль опрацювання помилок
+ON ERROR ErrorHandler(ERROR(),PROGRAM(),LINENO())
+*
+WITH _SCREEN
+ .WindowState = 2
+ .Caption = 'КАЛЬКУЛЯЦИЯ ПО СТ. "МАТЕРИАЛЫ" И "КОМПЛЕКТУЮЩИЕ"'
+ENDWITH
+*
+PUBLIC oZakaz, oRez, oZar, oRentab, oCex, oTransp
+DO definepad.prg
+READ EVENTS

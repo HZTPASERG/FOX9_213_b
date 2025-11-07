@@ -1,0 +1,40 @@
+CREATE DATABASE data1
+OPEN DATABASE data1
+CREATE CONNECTION Con1;
+DATASOURCE DPO;
+DATABASE DPO
+nKonHandle = SQLCONNECT('Con1')
+SQLSETPROP(nKonHandle,'DISPWARNING',.T.)
+CLOSE DATABASE
+*Материалы
+SELECT IIF(LEN(ALLTRIM(STR(km))) = 7, ALLTRIM(STR(km)), IIF(LEN(ALLTRIM(STR(km))) = 6, '0' + ALLTRIM(STR(km)),;
+IIF( LEN(ALLTRIM(STR(km))) = 5, '00' + ALLTRIM(STR(km)), IIF( LEN(ALLTRIM(STR(km))) = 4, '000' + ALLTRIM(STR(km)),;
+IIF( LEN(ALLTRIM(STR(km))) = 3, '0000' + ALLTRIM(STR(km)), IIF( LEN(ALLTRIM(STR(km))) = 2, '00000' + ALLTRIM(STR(km)),;
+IIF( LEN(ALLTRIM(STR(km))) = 1, '000000' + ALLTRIM(STR(km)), '0000000' ) ) ) ) ) ) ) AS kod_mat, zd, zp FROM str_spr;
+INTO CURSOR Cur01
+*
+SELECT * FROM Cur01 GROUP BY kod_mat, zd, zp ORDER BY kod_mat INTO CURSOR Cur02
+*
+DECLARE uX(3)
+SCAN
+ STORE kod_mat TO uX(1)
+ STORE zd TO uX(2)
+ STORE zp TO uX(3)
+ nR = SQLEXEC(nKonHandle,'EXECUTE Ins95 ?uX(1), ?uX(2), ?uX(3)')
+ENDSCAN
+*Комплектующие
+SELECT IIF(LEN(ALLTRIM(STR(kk))) = 7, ALLTRIM(STR(kk)), IIF(LEN(ALLTRIM(STR(kk))) = 6, '0' + ALLTRIM(STR(kk)),;
+IIF( LEN(ALLTRIM(STR(kk))) = 5, '00' + ALLTRIM(STR(kk)), IIF( LEN(ALLTRIM(STR(kk))) = 4, '000' + ALLTRIM(STR(kk)),;
+IIF( LEN(ALLTRIM(STR(kk))) = 3, '0000' + ALLTRIM(STR(kk)), IIF( LEN(ALLTRIM(STR(kk))) = 2, '00000' + ALLTRIM(STR(kk)),;
+IIF( LEN(ALLTRIM(STR(kk))) = 1, '000000' + ALLTRIM(STR(kk)), '0000000' ) ) ) ) ) ) ) AS kod_kom, zd, zp FROM str_kom;
+INTO CURSOR Cur03
+*
+SELECT * FROM Cur03 GROUP BY kod_kom, zd, zp ORDER BY kod_kom INTO CURSOR Cur04
+*
+DECLARE uX(3)
+SCAN
+ STORE kod_kom TO uX(1)
+ STORE zd TO uX(2)
+ STORE zp TO uX(3)
+ nR = SQLEXEC(nKonHandle,'EXECUTE Ins96 ?uX(1), ?uX(2), ?uX(3)')
+ENDSCAN

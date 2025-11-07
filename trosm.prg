@@ -1,0 +1,51 @@
+WAIT 'ТР - РАСЧЁТ ОСНОВНЫХ МАТРЕИАЛОВ' WINDOW NOWAIT
+*
+SET DECIMAL TO 8
+SELECT tr, i, ich AS kod_det, z1, z2, z3, z4, z5, z6, z7, SUM(q) AS q FROM trMy103mq;
+GROUP BY tr, i, ich, z1, z7 ORDER BY tr, i, ich, z1, z7 INTO CURSOR Cur103mq
+*
+SELECT * FROM trTable11050 WHERE cp = '37' OR cp = '39' ORDER BY tr, izd, kod_det INTO CURSOR Cur11050_37
+SELECT * FROM trTable11050 WHERE !cp = '37' AND !cp = '39' ORDER BY tr, izd, kod_det INTO CURSOR Cur11050
+*Для всех строк 11050 где цех-изг не равно 37 и 39
+SELECT Cur103mq.tr, Cur103mq.i, Cur103mq.kod_det, kod_mat, raz_zag, ei, massa_det, norma_na_d, cp AS ci,;
+ALLTRIM(STR(tol, 8, 2)) + '*' + ALLTRIM(STR(shir, 8, 2)) + '*' + ALLTRIM(STR(Dl, 8, 2)) AS razm,;
+VAL(ALLTRIM(STR(q, 8,2))) AS q, VAL(ALLTRIM(STR(q * norma_na_d, 13,8))) AS norma_na_i FROM Cur103mq, Cur11050;
+WHERE Cur103mq.tr = Cur11050.tr AND Cur103mq.i = Cur11050.izd AND Cur103mq.kod_det = Cur11050.kod_det;
+ORDER BY Cur103mq.tr, Cur103mq.i, Cur103mq.kod_det INTO CURSOR CurOsm
+*Для всех строк 11050 где цех-изг равно 37 или 39
+SELECT Cur103mq.tr, Cur103mq.i, Cur103mq.kod_det, kod_mat, raz_zag, ei, massa_det, norma_na_d,;
+z1, z2, z3, z4, z5, z6, z7, SPACE(2) AS ci, ALLTRIM(STR(tol, 8, 2)) + '*' + ALLTRIM(STR(shir, 8, 2)) + '*' + ALLTRIM(STR(Dl, 8, 2)) AS razm,;
+VAL(ALLTRIM(STR(q, 8,2))) AS q, VAL(ALLTRIM(STR(q * norma_na_d, 13,8))) AS norma_na_i FROM Cur103mq, Cur11050_37;
+WHERE Cur103mq.tr = Cur11050_37.tr AND Cur103mq.i = Cur11050_37.izd AND Cur103mq.kod_det = Cur11050_37.kod_det;
+ORDER BY Cur103mq.tr, Cur103mq.i, Cur103mq.kod_det INTO TABLE TabOsm_37
+*Обработка строк 11050 на 37 и 39 цех (07)
+SCAN
+ REPLACE ci WITH IIF( !z1 = '37' AND !z1 = '39', z1, IIF( !z2 = '00' AND !z2 = '37' AND !z2 = '07' AND !z2 = '15' AND !z2 = '39', z2,;
+ IIF( !z3 = '00' AND !z3 = '37' AND !z3 = '07' AND !z3 = '15' AND !z3 = '39', z3, IIF( !z4 = '00' AND !z4 = '37' AND !z4 = '07' AND !z4 = '15' AND !z4 = '39', z4,;
+ IIF( !z5 = '00' AND !z5 = '37' AND !z5 = '07' AND !z5 = '15' AND !z5 = '39', z5, IIF( !z6 = '00' AND !z6 = '37' AND !z6 = '07' AND !z6 = '15' AND !z6 = '39', z6, z7 ) ) ) ) ) )
+ENDSCAN
+*
+SELECT tr, i, kod_det, kod_mat, raz_zag, ei, massa_det, norma_na_d, q, ci, razm, norma_na_i FROM CurOsm;
+UNION ALL;
+SELECT tr, i, kod_det, kod_mat, raz_zag, ei, massa_det, norma_na_d, q, ci, razm, norma_na_i FROM TabOsm_37;
+INTO CURSOR CurOsm0
+*
+DROP TABLE TabOsm_37
+*
+SELECT tr, i, kod_det, kod_mat, raz_zag, ei, SUM(q) AS q, razm, norma_na_d, ci AS cp, SUM(norma_na_i) AS norma_na_i FROM CurOsm0;
+GROUP BY tr, i, kod_det, kod_mat, ci ORDER BY tr, i, kod_det, kod_mat, ci INTO CURSOR Cur01
+* Сравниваем с 1081а 
+SELECT Cur01.tr, Cur01.i, Cur01.kod_det, Cur01.kod_mat, trTable1081a.naim_mat, trTable1081a.sortament, trTable1081a.marka,;
+Cur01.razm, Cur01.ei, Cur01.q, Cur01.norma_na_d, Cur01.cp, Cur01.norma_na_i FROM Cur01 LEFT JOIN trTable1081a;
+ON Cur01.tr = trTable1081a.tr AND Cur01.i = trTable1081a.izd AND Cur01.kod_mat = trTable1081a.kod_mat;
+ORDER BY Cur01.tr, Cur01.i, Cur01.kod_det, Cur01.kod_mat INTO CURSOR Cur02
+*
+SELECT Cur02.tr, Cur02.i, kod_det, kod_mat, naim_mat, sortament, marka, razm, ed_izm, q, norma_na_d, cp, norma_na_i;
+FROM Cur02 LEFT JOIN table_ei ON Cur02.ei = table_ei.kod_izm ORDER BY kod_det, kod_mat INTO CURSOR Cur03
+* Сравниваем с 10857
+SELECT Cur03.tr, Cur03.i, Cur03.kod_det, inn AS naim_det, Cur03.kod_mat, Cur03.naim_mat, Cur03.cp, Cur03.sortament,;
+Cur03.marka, Cur03.razm, Cur03.ed_izm, Cur03.q, Cur03.norma_na_d, Cur03.norma_na_i;
+FROM Cur03 LEFT JOIN trTable10857 ON Cur03.tr = trTable10857.tr AND Cur03.i = trTable10857.izd AND Cur03.kod_det = trTable10857.i;
+ORDER BY Cur03.tr, Cur03.i, Cur03.kod_det, Cur03.kod_mat INTO TABLE trTable_osm
+*
+WAIT CLEAR

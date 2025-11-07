@@ -1,0 +1,90 @@
+CREATE DATABASE data1
+OPEN DATABASE data1
+CREATE CONNECTION Con1;
+DATASOURCE DPO;
+DATABASE DPO
+nKonHandle = SQLCONNECT('Con1')
+SQLSETPROP(nKonHandle,'DISPWARNING',.T.)
+CLOSE DATABASE
+*
+*Ã¿“≈–»¿À€
+SELECT LEFT(ALLTRIM(i), 12) AS kod_izd, IIF(LEN(ALLTRIM(STR(km))) = 7, ALLTRIM(STR(km)), IIF(LEN(ALLTRIM(STR(km))) = 6, '0' + ALLTRIM(STR(km)),;
+IIF( LEN(ALLTRIM(STR(km))) = 5, '00' + ALLTRIM(STR(km)), IIF( LEN(ALLTRIM(STR(km))) = 4, '000' + ALLTRIM(STR(km)),;
+IIF( LEN(ALLTRIM(STR(km))) = 3, '0000' + ALLTRIM(STR(km)), IIF( LEN(ALLTRIM(STR(km))) = 2, '00000' + ALLTRIM(STR(km)),;
+IIF( LEN(ALLTRIM(STR(km))) = 1, '000000' + ALLTRIM(STR(km)), '0000000' ) ) ) ) ) ) ) AS kod_mat, n AS q,;
+IIF(LEN(ALLTRIM(STR(ze))) = 1, '0' + ALLTRIM(STR(ze)), ALLTRIM(STR(ze)) ) AS cex, 0 AS transp, zd AS cd, zp AS cp,;
+s_d AS cd_0, s_p AS cp_0 FROM str213 INTO CURSOR CurM00
+INDEX ON kod_izd TAG tIzd
+*
+DECLARE uX(13)
+SELECT kod_izd FROM CurM00 GROUP BY kod_izd ORDER BY kod_izd INTO CURSOR Cur01
+STORE RECCOUNT() TO nCount
+SCAN
+ STORE RECNO() TO nRec
+ WAIT ALLTRIM(STR(nRec)) + SPACE(2) + ALLTRIM(STR(nCount)) WINDOW NOWAIT
+ STORE '' TO uX(1)
+ STORE kod_izd TO uX(2)
+ STORE '' TO uX(13)
+ *
+ nR = SQLEXEC(nKonHandle,'EXEC t10857naim ?uX(2), ?@uX(13)')
+ IF !ISNULL(uX(13))
+  SELECT * FROM CurM00 WHERE kod_izd = uX(2) GROUP BY kod_izd, kod_mat, cex INTO CURSOR Cur02
+  *
+  SELECT kod_izd, kod_mat, q, cex, transp, cd, cp, cd_0, cp_0 FROM Cur02 ORDER BY kod_mat, cex INTO CURSOR Cur03
+  SCAN
+   STORE kod_mat TO uX(3)
+   STORE q TO uX(4)
+   STORE ALLTRIM(cex) TO uX(5)
+   STORE transp TO uX(6)
+   STORE cd TO uX(7)
+   STORE cp TO uX(8)
+   STORE cd_0 TO uX(9)
+   STORE cp_0 TO uX(10)
+   STORE 0 TO uX(11)
+   STORE 0 TO uX(12)
+   *
+   nR = SQLEXEC(nKonHandle,'EXEC Ins93 ?uX(1), ?uX(2), ?uX(13), ?uX(3), ?uX(4), ?uX(5), ?uX(6), ?uX(7), ?uX(8), ?uX(9), ?uX(10), ?uX(11), ?uX(12)')
+  ENDSCAN
+ ENDIF
+ENDSCAN
+*
+* ŒÃœÀ≈ “”ﬁŸ»≈
+SELECT LEFT(ALLTRIM(i), 12) AS kod_izd, IIF(LEN(ALLTRIM(STR(kk))) = 7, ALLTRIM(STR(kk)), IIF(LEN(ALLTRIM(STR(kk))) = 6, '0' + ALLTRIM(STR(kk)),;
+IIF( LEN(ALLTRIM(STR(kk))) = 5, '00' + ALLTRIM(STR(kk)), IIF( LEN(ALLTRIM(STR(kk))) = 4, '000' + ALLTRIM(STR(kk)),;
+IIF( LEN(ALLTRIM(STR(kk))) = 3, '0000' + ALLTRIM(STR(kk)), IIF( LEN(ALLTRIM(STR(kk))) = 2, '00000' + ALLTRIM(STR(kk)),;
+IIF( LEN(ALLTRIM(STR(kk))) = 1, '000000' + ALLTRIM(STR(kk)), '0000000' ) ) ) ) ) ) ) AS kod_kom, q,;
+IIF(LEN(ALLTRIM(STR(ze))) = 1, '0' + ALLTRIM(STR(ze)), ALLTRIM(STR(ze)) ) AS cex, 0 AS transp, zd AS cd, zp AS cp,;
+s_d AS cd_0, s_p AS cp_0 FROM b_k334 INTO CURSOR CurK00
+INDEX ON kod_izd TAG tIzd
+*
+DECLARE uX(13)
+SELECT kod_izd FROM CurK00 GROUP BY kod_izd ORDER BY kod_izd INTO CURSOR Cur04
+STORE RECCOUNT() TO nCount
+SCAN
+ STORE RECNO() TO nRec
+ WAIT ALLTRIM(STR(nRec)) + SPACE(2) + ALLTRIM(STR(nCount)) WINDOW NOWAIT
+ STORE '' TO uX(1)
+ STORE kod_izd TO uX(2)
+ STORE '' TO uX(13)
+ *
+ nR = SQLEXEC(nKonHandle,'EXEC t10857naim ?uX(2), ?@uX(13)')
+ IF !ISNULL(uX(13))
+  SELECT * FROM CurK00 WHERE kod_izd = uX(2) GROUP BY kod_izd, kod_kom, cex INTO CURSOR Cur05
+  *
+  SELECT kod_izd, kod_kom, q, cex, transp, cd, cp, cd_0, cp_0 FROM Cur05 ORDER BY kod_kom, cex INTO CURSOR Cur06
+  SCAN
+   STORE kod_kom TO uX(3)
+   STORE q TO uX(4)
+   STORE ALLTRIM(cex) TO uX(5)
+   STORE transp TO uX(6)
+   STORE cd TO uX(7)
+   STORE cp TO uX(8)
+   STORE cd_0 TO uX(9)
+   STORE cp_0 TO uX(10)
+   STORE 0 TO uX(11)
+   STORE 0 TO uX(12)
+   *
+   nR = SQLEXEC(nKonHandle,'EXEC Ins94 ?uX(1), ?uX(2), ?uX(13), ?uX(3), ?uX(4), ?uX(5), ?uX(6), ?uX(7), ?uX(8), ?uX(9), ?uX(10), ?uX(11), ?uX(12)')
+  ENDSCAN
+ ENDIF
+ENDSCAN

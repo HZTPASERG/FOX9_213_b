@@ -1,0 +1,49 @@
+LOCAL loErr AS Exception
+
+WAIT 'Расчёт 402-oй....' + CHR(13) + CHR(13) + 'Подождите....'WINDOW NOWAIT
+IF !USED('b402pw')
+ TRY
+	 USE b402pw IN 0 EXCLUSIVE
+ CATCH  TO loErr
+	IF loErr.Errorno = 15 OR loErr.Errorno = 2091
+ 		CREATE TABLE b402pw (izd C(80), tr C(10), i C(80), gr C(3), ci C(2), cp C(2), w C, q N(8, 0))
+ 	ENDIF
+ ENDTRY
+ENDIF
+SELECT b402pw
+ZAP
+SELECT tr, i, ich, z1, z2, z3, z4, z5, z6, z7, SUM(q) AS q, '001' AS gr FROM My103_m;
+GROUP BY tr, i, ich, z1, z7 ORDER BY tr, i, ich, z1, z7 INTO CURSOR CurTmp
+SELECT * FROM CurTmp WHERE q > 0 INTO CURSOR CurMy103mq 
+SCAN
+ FOR nI = 1 TO 6
+  cCex = 'CurMy103mq.z' + ALLTRIM(STR(nI))
+  cCexNext = 'CurMy103mq.z' + ALLTRIM(STR(nI + 1))
+  IF !&cCexNext = '00'
+   SELECT b402pw
+   APPEN BLANK
+   REPLACE tr WITH CurMy103mq.tr;
+   				   izd WITH CurMy103mq.i;
+                   i WITH CurMy103mq.ich;
+                   gr WITH CurMy103mq.gr;
+                   ci WITH &cCex;
+                   cp WITH &cCexNext;
+                   w WITH STR(nI, 1,0);
+                   q WITH CurMy103mq.q
+  ELSE                    
+   SELECT b402pw
+   APPEN BLANK
+   REPLACE tr WITH CurMy103mq.tr;
+   				   izd WITH CurMy103mq.i;
+                   i WITH CurMy103mq.ich;
+                   gr WITH CurMy103mq.gr;
+                   ci WITH &cCex;
+                   cp WITH CurMy103mq.z7;
+                   w WITH STR(nI, 1,0);
+                   q WITH CurMy103mq.q  
+   EXIT                
+  ENDIF
+ ENDFOR
+ENDSCAN
+SELECT izd, tr, i, gr, ci, cp, w, SUM(q) AS q FROM b402pw GROUP BY tr, izd, i, ci, cp, w INTO CURSOR Cur402pw
+SELECT izd, tr, i, gr, ci, cp, w, IIF(ROUND(q,0) = 0, 00001, ROUND(q,0)) AS q FROM Cur402pw ORDER BY tr, izd, i, ci, cp, w INTO TABLE m402pw
